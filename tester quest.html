@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Tester</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #222; color: white; text-align: center; }
+        .container { max-width: 500px; margin: auto; padding: 20px; background: #333; border-radius: 10px; }
+        input, button { margin: 10px; padding: 10px; width: 90%; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Quiz Tester</h1>
+        <button onclick="startTest()">Start Test</button>
+        <button onclick="clearAllQuestions()">Clear All Questions</button>
+        <button id="stopButton" class="hidden" onclick="stopTest()">Stop</button>
+        <form id="addForm">
+            <input type="text" id="question" placeholder="Enter question" autocomplete="off">
+            <input type="text" id="answer" placeholder="Enter answer" autocomplete="off">
+            <button type="submit">Add Question</button>
+        </form>
+        <div id="quiz" class="hidden">
+            <p id="quizQuestion"></p>
+            <input type="text" id="userAnswer" placeholder="Your answer">
+            <button onclick="checkAnswer()">Check</button>
+            <button onclick="deleteQuestion()">Delete</button>
+        </div>
+    </div>
+    
+    <script>
+        let questions = [];
+        let currentIndex = null;
+        let isTesting = false;
+
+        document.getElementById("addForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+            let q = document.getElementById("question").value;
+            let a = document.getElementById("answer").value;
+            questions.push({ question: q, answer: a });
+            this.reset();
+        });
+
+        function startTest() {
+            if (questions.length === 0) return alert("No questions available!");
+            isTesting = true;
+            document.getElementById("stopButton").classList.remove("hidden");
+            askQuestion();
+        }
+
+        function askQuestion() {
+            if (!isTesting) return;
+            currentIndex = Math.floor(Math.random() * questions.length);
+            document.getElementById("quizQuestion").innerText = questions[currentIndex].question;
+            document.getElementById("quiz").classList.remove("hidden");
+        }
+
+        function checkAnswer() {
+            let userAns = document.getElementById("userAnswer").value;
+            alert("Correct answer: " + questions[currentIndex].answer);
+            document.getElementById("userAnswer").value = "";
+            if (isTesting) askQuestion();
+        }
+
+        function deleteQuestion() {
+            questions.splice(currentIndex, 1);
+            document.getElementById("quiz").classList.add("hidden");
+            if (questions.length === 0) {
+                isTesting = false;
+                document.getElementById("stopButton").classList.add("hidden");
+                alert("No more questions left!");
+            } else if (isTesting) {
+                askQuestion();
+            }
+        }
+
+        function clearAllQuestions() {
+            questions = [];
+            alert("All questions have been cleared!");
+            isTesting = false;
+            document.getElementById("quiz").classList.add("hidden");
+            document.getElementById("stopButton").classList.add("hidden");
+        }
+
+        function stopTest() {
+            isTesting = false;
+            document.getElementById("quiz").classList.add("hidden");
+            document.getElementById("stopButton").classList.add("hidden");
+            alert("Quiz stopped!");
+        }
+    </script>
+</body>
+</html>
